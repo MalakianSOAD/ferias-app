@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Férias do Tiago</title>
+<link rel="manifest" href="manifest.json">
+<style>
+body{font-family:Arial;margin:0;background:#0f172a;color:white;padding:20px}
+.card{background:#1e293b;border-radius:16px;padding:20px;max-width:500px;margin:auto}
+.days{font-size:72px;text-align:center;font-weight:bold}
+.bar{height:14px;background:#334155;border-radius:99px;overflow:hidden}
+.fill{height:100%;background:#22c55e}
+</style></head><body>
+<div class="card">
+<h1>🏖️ Férias 31/08/2026</h1>
+<div id="days" class="days"></div>
+<div class="bar"><div id="fill" class="fill"></div></div>
+<p id="pct"></p>
+<p>53 dias de trabalho • 22 folgas</p>
+</div>
+<script>
+const start=new Date('2026-06-17');
+const end=new Date('2026-08-31');
+function u(){
+ let now=new Date();
+ let total=Math.ceil((end-start)/86400000);
+ let rem=Math.max(0,Math.ceil((end-now)/86400000));
+ let pct=((total-rem)/total)*100;
+ days.textContent=rem;
+ fill.style.width=Math.max(0,Math.min(100,pct))+'%';
+ pctEl=document.getElementById('pct');
+ pctEl.textContent=pct.toFixed(1)+'% concluído';
+}
+u();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+</script>
+</body></html>
