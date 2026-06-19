@@ -445,9 +445,10 @@ function countdown() {
 }
 
 function filtered() {
-  if (currentFilter === 'all') return SCHEDULE;
-  if (currentFilter === 'folga') return SCHEDULE.filter(d => ['dsr','comp','folga'].includes(d.cat));
-  return SCHEDULE.filter(d => d.cat === currentFilter);
+  const upcoming = SCHEDULE.filter(d => d.date >= TODAY);
+  if (currentFilter === 'all') return upcoming;
+  if (currentFilter === 'folga') return upcoming.filter(d => ['dsr','comp','folga'].includes(d.cat));
+  return upcoming.filter(d => d.cat === currentFilter);
 }
 
 function setView(v) {
