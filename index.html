@@ -1,36 +1,433 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Férias do Tiago</title>
-<link rel="manifest" href="manifest.json">
+
 <style>
-body{font-family:Arial;margin:0;background:#0f172a;color:white;padding:20px}
-.card{background:#1e293b;border-radius:16px;padding:20px;max-width:500px;margin:auto}
-.days{font-size:72px;text-align:center;font-weight:bold}
-.bar{height:14px;background:#334155;border-radius:99px;overflow:hidden}
-.fill{height:100%;background:#22c55e}
-</style></head><body>
-<div class="card">
-<h1>🏖️ Férias 31/08/2026</h1>
-<div id="days" class="days"></div>
-<div class="bar"><div id="fill" class="fill"></div></div>
-<p id="pct"></p>
-<p>53 dias de trabalho • 22 folgas</p>
-</div>
-<script>
-const start=new Date('2026-06-17');
-const end=new Date('2026-08-31');
-function u(){
- let now=new Date();
- let total=Math.ceil((end-start)/86400000);
- let rem=Math.max(0,Math.ceil((end-now)/86400000));
- let pct=((total-rem)/total)*100;
- days.textContent=rem;
- fill.style.width=Math.max(0,Math.min(100,pct))+'%';
- pctEl=document.getElementById('pct');
- pctEl.textContent=pct.toFixed(1)+'% concluído';
+:root{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#f8fafc;
+--green:#22c55e;
+--blue:#3b82f6;
+--yellow:#f59e0b;
 }
-u();
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+
+.light{
+--bg:#f8fafc;
+--card:#ffffff;
+--text:#0f172a;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+padding:20px;
+transition:.3s;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.card{
+background:var(--card);
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+h1,h2{
+margin-bottom:10px;
+}
+
+.countdown{
+font-size:72px;
+font-weight:bold;
+text-align:center;
+}
+
+.subtitle{
+text-align:center;
+opacity:.8;
+}
+
+.progress{
+height:20px;
+background:#334155;
+border-radius:999px;
+overflow:hidden;
+margin-top:15px;
+}
+
+.progress-bar{
+height:100%;
+background:linear-gradient(90deg,#22c55e,#16a34a);
+width:0%;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:15px;
+}
+
+.stat{
+background:rgba(255,255,255,.05);
+padding:15px;
+border-radius:15px;
+text-align:center;
+}
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:8px;
+margin-top:15px;
+}
+
+.day{
+padding:10px;
+border-radius:10px;
+text-align:center;
+font-size:12px;
+}
+
+.work{background:#2563eb;}
+.com{background:#16a34a;}
+.dsr{background:#15803d;}
+.today{border:2px solid #fff;}
+
+button{
+border:none;
+padding:12px 18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.theme{
+background:#6366f1;
+color:white;
+margin-bottom:15px;
+}
+
+.quote{
+font-size:18px;
+text-align:center;
+font-style:italic;
+line-height:1.5;
+}
+
+.chart{
+margin-top:15px;
+}
+
+.bar{
+height:28px;
+border-radius:999px;
+margin-bottom:12px;
+display:flex;
+align-items:center;
+padding-left:12px;
+font-weight:bold;
+color:white;
+}
+
+.workBar{
+background:#2563eb;
+width:71%;
+}
+
+.offBar{
+background:#16a34a;
+width:29%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<button class="theme" onclick="toggleTheme()">
+🌙 Alternar Tema
+</button>
+
+<div class="card">
+
+<h1>🏖️ Contagem para as Férias</h1>
+
+<div id="countdown" class="countdown">--</div>
+
+<div class="subtitle">
+Férias iniciam em 31/08/2026
+</div>
+
+<div class="progress">
+<div id="progressBar" class="progress-bar"></div>
+</div>
+
+<p id="percent" style="margin-top:10px;text-align:center;"></p>
+
+</div>
+
+<div class="card">
+
+<h2>📅 Próxima Folga</h2>
+
+<h1 id="nextOff">
+29/08/2026
+</h1>
+
+<p>
+Última folga antes das férias.
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>📊 Estatísticas</h2>
+
+<div class="stats">
+
+<div class="stat">
+<h3>53</h3>
+<p>Dias Trabalho</p>
+</div>
+
+<div class="stat">
+<h3>22</h3>
+<p>Folgas</p>
+</div>
+
+<div class="stat">
+<h3>29.3%</h3>
+<p>Folga</p>
+</div>
+
+</div>
+
+<div class="chart">
+
+<div class="bar workBar">
+💼 Trabalho 53 dias
+</div>
+
+<div class="bar offBar">
+🏖️ Folga 22 dias
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>💡 Motivação</h2>
+
+<div class="quote" id="quote"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🗓️ Próximos Dias</h2>
+
+<div class="calendar" id="calendar"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const vacationDate =
+new Date("2026-08-31");
+
+const startDate =
+new Date("2026-06-17");
+
+const quotes = [
+
+"Cada plantão cumprido é um passo mais perto da praia.",
+
+"Disciplina hoje. Descanso amanhã.",
+
+"Você já percorreu boa parte da jornada.",
+
+"Foco no processo. As férias são consequência.",
+
+"73 dias parecem muitos. Um dia de cada vez.",
+
+"Você está mais perto das férias do que ontem."
+
+];
+
+function updateCountdown(){
+
+const now = new Date();
+
+const diff =
+vacationDate - now;
+
+const days =
+Math.ceil(diff /
+(1000*60*60*24));
+
+const total =
+(vacationDate-startDate)/
+(1000*60*60*24);
+
+const done =
+total-days;
+
+const percent =
+Math.max(0,
+(done/total)*100);
+
+if(days <= 0){
+
+document.getElementById(
+"countdown"
+).innerHTML =
+"🎉 FÉRIAS!";
+
+return;
+
+}
+
+document.getElementById(
+"countdown"
+).innerText = days;
+
+document.getElementById(
+"progressBar"
+).style.width =
+percent+"%";
+
+document.getElementById(
+"percent"
+).innerText =
+percent.toFixed(1)+
+"% concluído";
+
+}
+
+function randomQuote(){
+
+const quote =
+quotes[
+Math.floor(
+Math.random()*quotes.length
+)
+];
+
+document.getElementById(
+"quote"
+).innerText =
+quote;
+
+}
+
+function generateCalendar(){
+
+const container =
+document.getElementById(
+"calendar"
+);
+
+const today =
+new Date();
+
+for(let i=0;i<35;i++){
+
+let d =
+new Date();
+
+d.setDate(
+today.getDate()+i
+);
+
+let div =
+document.createElement(
+"div"
+);
+
+div.className =
+"day work";
+
+if(
+d.getDay()==0
+){
+div.className =
+"day dsr";
+}
+
+if(
+d.getDay()==6
+){
+div.className =
+"day com";
+}
+
+div.innerHTML =
+d.getDate()+"/"+
+(d.getMonth()+1);
+
+container.appendChild(
+div
+);
+
+}
+
+}
+
+function toggleTheme(){
+
+document.body.classList
+.toggle("light");
+
+localStorage.setItem(
+"theme",
+document.body.classList
+.contains("light")
+);
+
+}
+
+if(
+localStorage.getItem(
+"theme"
+) === "true"
+){
+document.body.classList
+.add("light");
+}
+
+updateCountdown();
+randomQuote();
+generateCalendar();
+
+setInterval(
+updateCountdown,
+60000
+);
+
 </script>
-</body></html>
+
+</body>
+</html>
