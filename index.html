@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -409,7 +408,7 @@ const SCHEDULE = [{"date":"2026-06-18","day":18,"month":6,"year":2026,"weekday":
 
 const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const WDAYS  = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
-const TODAY  = '2026-06-18';
+const TODAY  = new Date().toISOString().slice(0, 10);
 
 let currentView   = 'calendar';
 let currentFilter = 'all';
@@ -442,7 +441,7 @@ function countdown() {
   const vacDate = new Date('2026-08-31');
   const todayD  = new Date(TODAY);
   const diff = Math.round((vacDate - todayD) / 86400000);
-  document.getElementById('daysLeft').textContent = diff;
+  document.getElementById('daysLeft').textContent = diff > 0 ? diff : 0;
 }
 
 function filtered() {
