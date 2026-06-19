@@ -35,8 +35,30 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
-  html { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; }
+  html { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; transition: background-color .25s, color .25s; }
   body { min-height: 100vh; }
+
+  html[data-theme="light"] {
+    --bg:       #F5F4F1;
+    --surface:  #FFFFFF;
+    --border:   #E2E0DA;
+    --muted:    #C9C6BD;
+    --text-dim: #8A8678;
+    --text:     #44423B;
+    --text-hi:  #1C1B17;
+
+    --work:     #2F6FB0;
+    --work-bg:  rgba(47,111,176,.10);
+    --dsr:      #2A9D74;
+    --dsr-bg:   rgba(42,157,116,.10);
+    --comp:     #2A9D74;
+    --comp-bg:  rgba(42,157,116,.10);
+    --folga:    #2A9D74;
+    --folga-bg: rgba(42,157,116,.10);
+    --outros:   #6B6F5E;
+    --outros-bg:rgba(107,111,94,.10);
+    --today:    #C04E2E;
+  }
 
   /* ── HEADER ── */
   header {
@@ -115,6 +137,23 @@
     color: rgba(232,114,90,.7);
     margin-top: 2px;
   }
+
+  .theme-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: border-color .15s, transform .15s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--muted); transform: scale(1.05); }
+  .theme-toggle:active { transform: scale(.95); }
 
   /* ── STATS BAR ── */
   .stats-bar {
@@ -387,6 +426,7 @@
       <div class="days" id="daysLeft">—</div>
       <div class="days-label">dias p/ férias</div>
     </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">🌙</button>
   </div>
 </header>
 
@@ -571,6 +611,14 @@ function renderList(data) {
   </div>`;
 
   document.getElementById('main').innerHTML = html;
+}
+
+let currentTheme = 'dark';
+
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '🌙' : '☀️';
 }
 
 countdown();
